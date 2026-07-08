@@ -131,6 +131,7 @@ jobs:
           BRIGHT_TOKEN: ${{ secrets.BRIGHT_TOKEN }}
           INFERENCE_URL: ${{ vars.INFERENCE_URL }}
           INFERENCE_TOKEN: ${{ secrets.INFERENCE_TOKEN }}
+          BRIGHT_HOSTNAME: ${{ vars.BRIGHT_HOSTNAME }}
           BRIGHT_PROJECT_ID: ${{ vars.BRIGHT_PROJECT_ID }}
           # Steering inputs — populated only for a `/bright-agent` comment; empty
           # for every other trigger, so the agent runs a normal scan.
