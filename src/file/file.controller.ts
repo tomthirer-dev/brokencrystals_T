@@ -34,6 +34,46 @@ import {
 } from './file.controller.swagger.desc';
 import { CloudProvidersMetaData } from './cloud.providers.metadata';
 
+const ALLOWED_CLOUD_PATHS = new Set([
+  'id',
+  'hostname',
+  'user-data',
+  'vendor-data',
+  'public-keys',
+  'region',
+  'interfaces',
+  'dns',
+  'floating_ip',
+  'reserved_ip',
+  'tags',
+  'features',
+  'ami-id',
+  'ami-launch-index',
+  'ami-manifest-path',
+  'block-device-mapping',
+  'events',
+  'iam',
+  'instance-action',
+  'instance-id',
+  'instance-life-cycle',
+  'instance-type',
+  'local-hostname',
+  'local-ipv4',
+  'mac',
+  'metrics',
+  'network',
+  'placement',
+  'profile',
+  'public-hostname',
+  'public-ipv4',
+  'reservation-id',
+  'security-groups',
+  'services',
+  'instance',
+  'project',
+  'oslogin'
+]);
+
 @Controller('/api/file')
 @ApiTags('Files controller')
 export class FileController {
@@ -73,7 +113,18 @@ export class FileController {
     }
 
     const normalizedPath = path.startsWith('/') ? path.slice(1) : path;
-    if (!normalizedPath || normalizedPath.includes('..')) {
+    if (
+      !normalizedPath ||
+      normalizedPath.includes('..') ||
+      normalizedPath.includes('?') ||
+      normalizedPath.includes('#') ||
+      normalizedPath.includes('\\')
+    ) {
+      throw new BadRequestException(`Invalid paramater 'path' ${path}`);
+    }
+
+    const rootSegment = normalizedPath.split('/')[0];
+    if (!ALLOWED_CLOUD_PATHS.has(rootSegment)) {
       throw new BadRequestException(`Invalid paramater 'path' ${path}`);
     }
 
