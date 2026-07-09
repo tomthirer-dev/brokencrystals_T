@@ -1,18 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import axios from 'axios';
 
 @Injectable()
 export class CloudProvidersMetaData {
-  public static readonly GOOGLE: string =
-    'http://metadata.google.internal/computeMetadata/v1/';
-  public static readonly AZURE: string =
-    'http://169.254.169.254/metadata/instance';
-  public static readonly DIGITAL_OCEAN: string =
-    'http://169.254.169.254/metadata/v1';
-  public static readonly DIGITAL_OCEAN_JSON: string =
-    'http://169.254.169.254/metadata/v1.json'; //https://docs.digitalocean.com/reference/api/metadata/#tag/Droplet-Properties
-  public static readonly AWS: string =
-    'http://169.254.169.254/latest/meta-data/';
+  public static readonly GOOGLE: string = 'google';
+  public static readonly AZURE: string = 'azure';
+  public static readonly DIGITAL_OCEAN: string = 'digital_ocean';
+  public static readonly DIGITAL_OCEAN_JSON: string = 'digital_ocean_json';
+  public static readonly AWS: string = 'aws';
 
   private providers: Map<string, string> = new Map<string, string>();
 
@@ -261,11 +255,7 @@ export class CloudProvidersMetaData {
     } else if (providerUrl.startsWith(CloudProvidersMetaData.AZURE)) {
       return this.providers.get(CloudProvidersMetaData.AZURE);
     } else {
-      const { data } = await axios(providerUrl, {
-        timeout: 5000,
-        responseType: 'text'
-      });
-      return data;
+      throw new Error('unsupported provider url');
     }
   }
 }

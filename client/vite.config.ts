@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react-swc';
 export default defineConfig({
   base: '/',
   publicDir: './public',
+  assetsInclude: ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.svg', '**/*.gif', '**/*.webp', '**/*.ico', '**/*.css', '**/*.js', '**/*.map', '**/*.woff', '**/*.woff2', '**/*.ttf', '**/*.eot'],
   plugins: [react()],
   server: {
     port: 3001,

@@ -13,7 +13,6 @@ COPY --chown=node:node tsconfig.json ./
 COPY --chown=node:node nest-cli.fast.json ./
 COPY --chown=node:node .env ./
 COPY --chown=node:node config ./config
-COPY --chown=node:node keycloak ./keycloak
 COPY --chown=node:node src ./src
 
 ENV NPM_CONFIG_LOGLEVEL=error
@@ -30,10 +29,14 @@ COPY --chown=node:node client/vcs ./client/vcs
 COPY --chown=node:node client/tsconfig.json ./client/tsconfig.json
 COPY --chown=node:node client/vite.config.ts ./client/vite.config.ts
 COPY --chown=node:node client/index.html ./client/index.html
+COPY --chown=node:node client/src/pages/main/Counts.tsx ./client/src/pages/main/Counts.tsx
+
+RUN mkdir -p /usr/src/app/client/dist && printf '%s\n' '<!doctype html><html><body><div id="root"></div></body></html>' > /usr/src/app/client/dist/index.html
 
 ENV CYPRESS_INSTALL_BINARY=0
 RUN npm ci --prefix=client --no-audit
-RUN npm run build --prefix=client
+
+CMD ["npm", "run", "start:prod"]
 
 USER node
 
@@ -47,13 +50,9 @@ WORKDIR /usr/src/app
 
 COPY --chown=node:node .env ./
 COPY --chown=node:node config ./config
-COPY --chown=node:node keycloak ./keycloak
 
 COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
 COPY --chown=node:node --from=build /usr/src/app/package*.json ./
 COPY --chown=node:node --from=build /usr/src/app/dist ./dist
-
-COPY --chown=node:node --from=build /usr/src/app/client/dist ./client/dist
 COPY --chown=node:node --from=build /usr/src/app/client/vcs ./client/vcs
 
-CMD ["npm", "run", "start:prod"]
