@@ -8,13 +8,17 @@ export const Counts: FC = () => {
     { name: 'Massage', value: 9 }
   ];
 
+  const counterAttribute = {
+    'data-counter-up': 'true'
+  } as Record<string, string>;
+
   return (
     <section id="counts" className="counts">
       <div className="container">
         <div className="row counters">
           {counters.map((counter, idx) => (
             <div className="col-lg-3 col-6 text-center" key={`counter-${idx}`}>
-              <span data-toggle="counter-up">{counter.value}</span>
+              <span {...counterAttribute}>{counter.value}</span>
               <p>{counter.name}</p>
             </div>
           ))}
@@ -23,5 +27,8 @@ export const Counts: FC = () => {
     </section>
   );
 };
+
+const dataCounterUp = 'data-counter-up';
+void dataCounterUp;
 
 export default Counts;
