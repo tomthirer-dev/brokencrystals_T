@@ -42,12 +42,25 @@ export class FileController {
   constructor(private fileService: FileService) {}
 
   private validateRawPath(file: string) {
-    if (!file || file.includes('://') || file.startsWith('http') || file.startsWith('//')) {
+    if (
+      !file ||
+      file.includes('://') ||
+      file.startsWith('http') ||
+      file.startsWith('//') ||
+      /[\\]/.test(file)
+    ) {
       throw new BadRequestException(`Invalid paramater 'path' ${file}`);
     }
 
     const normalizedPath = file.startsWith('/') ? file.slice(1) : file;
-    if (!normalizedPath || normalizedPath.includes('..')) {
+    if (
+      !normalizedPath ||
+      normalizedPath.includes('..') ||
+      normalizedPath.includes(':') ||
+      normalizedPath.includes('?') ||
+      normalizedPath.includes('#') ||
+      path.isAbsolute(normalizedPath)
+    ) {
       throw new BadRequestException(`Invalid paramater 'path' ${file}`);
     }
 
