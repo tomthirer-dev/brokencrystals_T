@@ -104,7 +104,6 @@ export class AuthController {
   }
 
   @Post('login')
-  @UseGuards(CsrfGuard)
   @ApiCreatedResponse({
     type: LoginResponse
   })
@@ -196,8 +195,8 @@ export class AuthController {
     const token = createHash('md5').update(fp).digest('hex');
 
     res.setCookie(this.CSRF_COOKIE_HEADER, token, {
-      httpOnly: true,
-      sameSite: 'strict'
+      httpOnly: false,
+      sameSite: 'lax'
     });
 
     return token;
@@ -217,8 +216,8 @@ export class AuthController {
 
     const token = randomBytes(32).toString('base64').substring(0, 32);
     res.setCookie(this.CSRF_COOKIE_HEADER, token, {
-      httpOnly: true,
-      sameSite: 'strict'
+      httpOnly: false,
+      sameSite: 'lax'
     });
     return token;
   }
