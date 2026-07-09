@@ -41,6 +41,19 @@ export class FileController {
 
   constructor(private fileService: FileService) {}
 
+  private validateCloudPath(path: string, cpBaseUrl: string) {
+    if (!path || path.includes('://') || path.startsWith('http') || path.startsWith('//')) {
+      throw new BadRequestException(`Invalid paramater 'path' ${path}`);
+    }
+
+    const normalizedPath = path.startsWith('/') ? path.slice(1) : path;
+    if (!normalizedPath || normalizedPath.includes('..')) {
+      throw new BadRequestException(`Invalid paramater 'path' ${path}`);
+    }
+
+    return `${cpBaseUrl}${normalizedPath}`;
+  }
+
   private getContentType(contentType: string) {
     if (contentType) {
       return contentType;
@@ -50,11 +63,8 @@ export class FileController {
   }
 
   private async loadCPFile(cpBaseUrl: string, path: string) {
-    if (!path.startsWith(cpBaseUrl)) {
-      throw new BadRequestException(`Invalid paramater 'path' ${path}`);
-    }
-
-    const file: Stream = await this.fileService.getFile(path);
+    const filePath = this.validateCloudPath(path, cpBaseUrl);
+    const file: Stream = await this.fileService.getFile(filePath);
 
     return file;
   }
