@@ -4,7 +4,6 @@ import { ConfigService } from '@nestjs/config';
 import { UsersService } from './users/users.service';
 import { AppModuleConfigProperties } from './app.module.config.properties';
 import { OrmModuleConfigProperties } from './orm/orm.module.config.properties';
-import { AppConfig } from './app.config.api';
 import { UserDto } from './users/api/UserDto';
 
 @Injectable()
@@ -43,17 +42,6 @@ export class AppService {
         rej(err.message);
       }
     });
-  }
-
-  getConfig(): AppConfig {
-    return {
-      awsBucket: this.configService.get<string>(
-        AppModuleConfigProperties.ENV_AWS_BUCKET
-      ),
-      googlemaps: this.configService.get<string>(
-        AppModuleConfigProperties.ENV_GOOGLE_MAPS
-      )
-    };
   }
 
   async getUserInfo(email: string): Promise<UserDto> {

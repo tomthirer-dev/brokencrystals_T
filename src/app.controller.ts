@@ -251,18 +251,6 @@ export class AppController {
     return { output };
   }
 
-  @Get('/config')
-  @ApiOperation({
-    description: API_DESC_CONFIG_SERVER
-  })
-  @ApiOkResponse({
-    type: AppConfig
-  })
-  getConfig(): AppConfig {
-    const config = this.appService.getConfig();
-    return config;
-  }
-
   @Get('/secrets')
   @ApiOperation({
     description: SWAGGER_DESC_SECRETS
