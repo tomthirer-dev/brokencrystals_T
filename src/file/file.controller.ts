@@ -82,17 +82,18 @@ export class FileController {
   constructor(private fileService: FileService) {}
 
   private validateRawPath(file: string) {
+    const decoded = file ? decodeURIComponent(file) : file;
     if (
-      !file ||
-      file.includes('://') ||
-      file.startsWith('http') ||
-      file.startsWith('//') ||
-      /[\\]/.test(file)
+      !decoded ||
+      decoded.includes('://') ||
+      decoded.startsWith('http') ||
+      decoded.startsWith('//') ||
+      /[\\]/.test(decoded)
     ) {
       throw new BadRequestException(`Invalid paramater 'path' ${file}`);
     }
 
-    const normalizedPath = file.startsWith('/') ? file.slice(1) : file;
+    const normalizedPath = decoded.startsWith('/') ? decoded.slice(1) : decoded;
     if (
       !normalizedPath ||
       normalizedPath.includes('..') ||
@@ -109,11 +110,12 @@ export class FileController {
   }
 
   private validateCloudPath(path: string, cpBaseUrl: string) {
-    if (!path || path.includes('://') || path.startsWith('http') || path.startsWith('//')) {
+    const decoded = path ? decodeURIComponent(path) : path;
+    if (!decoded || decoded.includes('://') || decoded.startsWith('http') || decoded.startsWith('//')) {
       throw new BadRequestException(`Invalid paramater 'path' ${path}`);
     }
 
-    const normalizedPath = path.startsWith('/') ? path.slice(1) : path;
+    const normalizedPath = decoded.startsWith('/') ? decoded.slice(1) : decoded;
     if (
       !normalizedPath ||
       normalizedPath.includes('..') ||

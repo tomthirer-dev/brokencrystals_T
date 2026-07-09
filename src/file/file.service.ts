@@ -12,15 +12,16 @@ export class FileService {
   private readonly allowedRoot = path.resolve(process.cwd());
 
   private sanitizeFilePath(file: string): string {
+    const decoded = file ? decodeURIComponent(file) : file;
     if (
-      !file ||
-      file.includes('://') ||
-      file.startsWith('http') ||
-      file.startsWith('//') ||
-      file.includes('\\') ||
-      file.includes('?') ||
-      file.includes('#') ||
-      file.includes('%')
+      !decoded ||
+      decoded.includes('://') ||
+      decoded.startsWith('http') ||
+      decoded.startsWith('//') ||
+      decoded.includes('\\') ||
+      decoded.includes('?') ||
+      decoded.includes('#') ||
+      decoded.includes('%')
     ) {
       throw new Error('invalid file path');
     }
@@ -34,13 +35,13 @@ export class FileService {
         CloudProvidersMetaData.DIGITAL_OCEAN,
         CloudProvidersMetaData.AWS
       ]) {
-        if (file.startsWith(providerUrl)) {
+        if (decoded.startsWith(providerUrl)) {
           throw new Error('invalid file path');
         }
       }
     }
 
-    const normalizedInput = file.startsWith('/') ? file.slice(1) : file;
+    const normalizedInput = decoded.startsWith('/') ? decoded.slice(1) : decoded;
     if (
       !normalizedInput ||
       normalizedInput.includes('..') ||
