@@ -88,7 +88,8 @@ export class FileController {
       decoded.includes('://') ||
       decoded.startsWith('http') ||
       decoded.startsWith('//') ||
-      /[\\]/.test(decoded)
+      /[\\]/.test(decoded) ||
+      decoded.includes('%')
     ) {
       throw new BadRequestException(`Invalid paramater 'path' ${file}`);
     }

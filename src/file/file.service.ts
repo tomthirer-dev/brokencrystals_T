@@ -26,21 +26,6 @@ export class FileService {
       throw new Error('invalid file path');
     }
 
-    if (this.cloudProviders) {
-      // Explicitly reject cloud-metadata style URLs/paths in the file reader.
-      // This service is intended for local filesystem access only.
-      for (const providerUrl of [
-        CloudProvidersMetaData.GOOGLE,
-        CloudProvidersMetaData.AZURE,
-        CloudProvidersMetaData.DIGITAL_OCEAN,
-        CloudProvidersMetaData.AWS
-      ]) {
-        if (decoded.startsWith(providerUrl)) {
-          throw new Error('invalid file path');
-        }
-      }
-    }
-
     const normalizedInput = decoded.startsWith('/') ? decoded.slice(1) : decoded;
     if (
       !normalizedInput ||
