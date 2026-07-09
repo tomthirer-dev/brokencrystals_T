@@ -55,14 +55,8 @@ export class FileService {
   }
 
   async deleteFile(file: string): Promise<boolean> {
-    if (file.startsWith('/')) {
-      throw new Error('cannot delete file from this location');
-    } else if (file.startsWith('http')) {
-      throw new Error('cannot delete file from this location');
-    } else {
-      file = path.resolve(process.cwd(), file);
-      await fs.promises.unlink(file);
-      return true;
-    }
+    const resolvedFile = this.sanitizeFilePath(file);
+    await fs.promises.unlink(resolvedFile);
+    return true;
   }
 }
