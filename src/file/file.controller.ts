@@ -112,7 +112,13 @@ export class FileController {
 
   private validateCloudPath(path: string, cpBaseUrl: string) {
     const decoded = path ? decodeURIComponent(path) : path;
-    if (!decoded || decoded.includes('://') || decoded.startsWith('http') || decoded.startsWith('//')) {
+    if (
+      !decoded ||
+      decoded.includes('://') ||
+      decoded.startsWith('http') ||
+      decoded.startsWith('//') ||
+      decoded.includes('%')
+    ) {
       throw new BadRequestException(`Invalid paramater 'path' ${path}`);
     }
 
@@ -122,7 +128,9 @@ export class FileController {
       normalizedPath.includes('..') ||
       normalizedPath.includes('?') ||
       normalizedPath.includes('#') ||
-      normalizedPath.includes('\\')
+      normalizedPath.includes('\\') ||
+      normalizedPath.includes(':') ||
+      path.isAbsolute(normalizedPath)
     ) {
       throw new BadRequestException(`Invalid paramater 'path' ${path}`);
     }
@@ -132,7 +140,7 @@ export class FileController {
       throw new BadRequestException(`Invalid paramater 'path' ${path}`);
     }
 
-    return `${cpBaseUrl}${normalizedPath}`;
+    return new URL(normalizedPath, cpBaseUrl).toString();
   }
 
   private getContentType(contentType: string) {
