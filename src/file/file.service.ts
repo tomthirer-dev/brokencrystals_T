@@ -9,21 +9,31 @@ import { R_OK } from 'constants';
 export class FileService {
   private readonly logger = new Logger(FileService.name);
   private cloudProviders = new CloudProvidersMetaData();
+  private readonly allowedRoot = path.resolve(process.cwd());
+
+  private sanitizeFilePath(file: string): string {
+    if (!file || file.includes('://') || file.startsWith('http') || file.startsWith('//')) {
+      throw new Error('invalid file path');
+    }
+
+    const resolvedPath = file.startsWith('/')
+      ? path.normalize(file)
+      : path.resolve(this.allowedRoot, file);
+
+    if (!resolvedPath.startsWith(this.allowedRoot + path.sep) && resolvedPath !== this.allowedRoot) {
+      throw new Error('invalid file path');
+    }
+
+    return resolvedPath;
+  }
 
   async getFile(file: string): Promise<Readable> {
-    this.logger.log(`Reading file: ${file}`);
+    const resolvedFile = this.sanitizeFilePath(file);
+    this.logger.log(`Reading file: ${resolvedFile}`);
 
-    if (file.startsWith('/')) {
-      await fs.promises.access(file, R_OK);
+    await fs.promises.access(resolvedFile, R_OK);
 
-      return fs.createReadStream(file);
-    } else {
-      file = path.resolve(process.cwd(), file);
-
-      await fs.promises.access(file, R_OK);
-
-      return fs.createReadStream(file);
-    }
+    return fs.createReadStream(resolvedFile);
   }
 
   async deleteFile(file: string): Promise<boolean> {

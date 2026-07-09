@@ -41,6 +41,19 @@ export class FileController {
 
   constructor(private fileService: FileService) {}
 
+  private validateRawPath(file: string) {
+    if (!file || file.includes('://') || file.startsWith('http') || file.startsWith('//')) {
+      throw new BadRequestException(`Invalid paramater 'path' ${file}`);
+    }
+
+    const normalizedPath = file.startsWith('/') ? file.slice(1) : file;
+    if (!normalizedPath || normalizedPath.includes('..')) {
+      throw new BadRequestException(`Invalid paramater 'path' ${file}`);
+    }
+
+    return normalizedPath;
+  }
+
   private validateCloudPath(path: string, cpBaseUrl: string) {
     if (!path || path.includes('://') || path.startsWith('http') || path.startsWith('//')) {
       throw new BadRequestException(`Invalid paramater 'path' ${path}`);
@@ -97,7 +110,7 @@ export class FileController {
     @Query('type') contentType: string,
     @Res({ passthrough: true }) res: FastifyReply
   ) {
-    const file: Stream = await this.fileService.getFile(path);
+    const file: Stream = await this.fileService.getFile(this.validateRawPath(path));
     const type = this.getContentType(contentType);
     res.type(type);
 
@@ -278,7 +291,7 @@ export class FileController {
     description: 'File deleted successfully'
   })
   async deleteFile(@Query('path') path: string): Promise<void> {
-    await this.fileService.deleteFile(path);
+    await this.fileService.deleteFile(this.validateRawPath(path));
   }
 
   @Put('raw')
@@ -296,10 +309,11 @@ export class FileController {
     @Body() raw: string
   ): Promise<string> {
     try {
+      const safeFile = this.validateRawPath(file);
       if (typeof raw === 'string' || Buffer.isBuffer(raw)) {
-        await fs.promises.access(path.dirname(file), W_OK);
-        await fs.promises.writeFile(file, raw);
-        return `File uploaded successfully at ${file}`;
+        await fs.promises.access(path.dirname(safeFile), W_OK);
+        await fs.promises.writeFile(safeFile, raw);
+        return `File uploaded successfully at ${safeFile}`;
       }
     } catch (err) {
       this.logger.error(err.message);
@@ -327,7 +341,7 @@ export class FileController {
     @Res({ passthrough: true }) res: FastifyReply
   ) {
     try {
-      const stream = await this.fileService.getFile(file);
+      const stream = await this.fileService.getFile(this.validateRawPath(file));
       res.type('application/octet-stream');
 
       return stream;
@@ -339,7 +353,7 @@ export class FileController {
 
   @GrpcMethod('FileService', 'ReadFile')
   async readFileGrpc(data: { path: string }): Promise<{ content: string }> {
-    const stream = await this.fileService.getFile(data.path);
+    const stream = await this.fileService.getFile(this.validateRawPath(data.path));
     const chunks = [];
     for await (const chunk of stream) {
       chunks.push(Buffer.from(chunk));
