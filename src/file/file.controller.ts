@@ -91,7 +91,7 @@ export class FileController {
       /[\\]/.test(decoded) ||
       decoded.includes('%')
     ) {
-      throw new BadRequestException(`Invalid paramater 'path' ${file}`);
+      throw new BadRequestException('Invalid path');
     }
 
     const normalizedPath = decoded.startsWith('/') ? decoded.slice(1) : decoded;
@@ -104,7 +104,7 @@ export class FileController {
       normalizedPath.includes('#') ||
       path.isAbsolute(normalizedPath)
     ) {
-      throw new BadRequestException(`Invalid paramater 'path' ${file}`);
+      throw new BadRequestException('Invalid path');
     }
 
     return normalizedPath;
@@ -119,7 +119,7 @@ export class FileController {
       decoded.startsWith('//') ||
       decoded.includes('%')
     ) {
-      throw new BadRequestException(`Invalid paramater 'path' ${path}`);
+      throw new BadRequestException('Invalid path');
     }
 
     const normalizedPath = decoded.startsWith('/') ? decoded.slice(1) : decoded;
@@ -132,12 +132,12 @@ export class FileController {
       normalizedPath.includes(':') ||
       path.isAbsolute(normalizedPath)
     ) {
-      throw new BadRequestException(`Invalid paramater 'path' ${path}`);
+      throw new BadRequestException('Invalid path');
     }
 
     const rootSegment = normalizedPath.split('/')[0];
     if (!ALLOWED_CLOUD_PATHS.has(rootSegment)) {
-      throw new BadRequestException(`Invalid paramater 'path' ${path}`);
+      throw new BadRequestException('Invalid path');
     }
 
     return new URL(normalizedPath, cpBaseUrl).toString();
@@ -392,8 +392,8 @@ export class FileController {
         return `File uploaded successfully at ${safeFile}`;
       }
     } catch (err) {
-      this.logger.error(err.message);
-      throw err.message;
+      this.logger.error(err?.message || 'File upload failed');
+      throw new BadRequestException('Invalid path');
     }
   }
 
@@ -422,7 +422,7 @@ export class FileController {
 
       return stream;
     } catch (err) {
-      this.logger.error(err.message);
+      this.logger.error(err?.message || 'File read failed');
       res.status(HttpStatus.NOT_FOUND);
     }
   }
