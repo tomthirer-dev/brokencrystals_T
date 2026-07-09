@@ -96,6 +96,7 @@ export class FileController {
     if (
       !normalizedPath ||
       normalizedPath.includes('..') ||
+      normalizedPath.includes('%') ||
       normalizedPath.includes(':') ||
       normalizedPath.includes('?') ||
       normalizedPath.includes('#') ||

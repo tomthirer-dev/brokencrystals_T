@@ -19,7 +19,8 @@ export class FileService {
       file.startsWith('//') ||
       file.includes('\\') ||
       file.includes('?') ||
-      file.includes('#')
+      file.includes('#') ||
+      file.includes('%')
     ) {
       throw new Error('invalid file path');
     }
@@ -40,7 +41,12 @@ export class FileService {
     }
 
     const normalizedInput = file.startsWith('/') ? file.slice(1) : file;
-    if (!normalizedInput || normalizedInput.includes('..') || path.isAbsolute(normalizedInput)) {
+    if (
+      !normalizedInput ||
+      normalizedInput.includes('..') ||
+      normalizedInput.includes(':') ||
+      path.isAbsolute(normalizedInput)
+    ) {
       throw new Error('invalid file path');
     }
 
